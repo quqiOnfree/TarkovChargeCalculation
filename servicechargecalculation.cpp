@@ -2,10 +2,38 @@
 #include "./ui_servicechargecalculation.h"
 
 #include <cmath>
+#include <functional>
 
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QTableWidget>
+
+template<typename T, typename Func>
+T getBestMax(T begin, T end, Func&& func, size_t n)
+{
+    T mid = (begin + end) / 2;
+    if (!n || mid == begin || mid == end) return mid;
+
+    T calbegin = func(begin), calmid = func(mid), calend = func(end);
+    if (calbegin < calend && calbegin < calmid)
+    {
+        return getBestMax(mid, end, func, n - 1);
+    }
+    else if (calbegin > calend && calmid > calend)
+    {
+        return getBestMax(begin, mid, func, n - 1);
+    }
+    else
+    {
+        T left = getBestMax(begin, mid, func, 1),
+            right = getBestMax(mid, end, func, 1);
+        T max = std::max(left, right);
+        if (max == left && max == right) return mid;
+        else if (max == left) return getBestMax(begin, mid, func, n - 1);
+        else return getBestMax(mid, end, func, n - 1);
+    }
+    return mid;
+}
 
 ServiceChargeCalculation::ServiceChargeCalculation(QWidget *parent)
     : QWidget(parent)
@@ -135,20 +163,25 @@ void ServiceChargeCalculation::onCalculateClicked()
         return;
     }
 
-    long double PO = VO > VR ? std::pow(std::log10l(VO / VR), 1.08l) : std::log10l(VO / VR),
-                PR = VR >= VO ? std::pow(std::log10l(VR / VO), 1.08l) : std::log10l(VR / VO);
+    const long double Ti = 0.03, Tr = 0.03;
 
-    long double Ti = 0.03, Tr = 0.03;
-    long double s = VO * Ti * std::pow(4.0l, PO) * Q + VR * Tr * std::pow(4.0l, PR) * Q;
+    auto function = [&](long double VR) {
+        long double PO = VO > VR ? std::pow(std::log10l(VO / VR), 1.08l) : std::log10l(VO / VR),
+            PR = VR >= VO ? std::pow(std::log10l(VR / VO), 1.08l) : std::log10l(VR / VO);
 
-    if (ui->checkBox->isChecked()) s = s * (0.7l - ui->spinBox->value() * 0.003l);
+        long double s = VO * Ti * std::pow(4.0l, PO) * Q + VR * Tr * std::pow(4.0l, PR) * Q;
 
-    auto derivativeOfFunction = [&](long double VR) {
+        if (ui->checkBox->isChecked()) s = s * (0.7l - ui->spinBox->value() * 0.003l);
+
+        return s;
+        };
+
+    auto derivativeOfVRRFunction = [&](long double VR) {
         return 1 + (VO * Ti * Q * std::log10l(4) * std::pow(4.0l, std::log10l(VO / VR)) / VR -
             Tr * Q * std::log10l(40) * std::pow(4.0l, std::log10l(VR / VO))) * (0.7l - ui->spinBox->value() * 0.003l);
         };
 
-    auto secondDerivativeOfFunction = [&](long double VR) {
+    auto secondDerivativeOfVRRFunction = [&](long double VR) {
         return (-1 * VO * Ti * Q * std::pow(std::log10l(4), 2) * std::pow(4.0l, std::log10l(VO / VR)) / std::pow(VR, 2) -
             Tr * Q * std::log10l(40) * std::log10l(4) * std::pow(4.0l, std::log10l(VR / VO)) / VR) * (0.7l - ui->spinBox->value() * 0.003l);
         };
@@ -156,14 +189,15 @@ void ServiceChargeCalculation::onCalculateClicked()
     long double bestVR = VR;
     for (int i = 0; i < 1000; ++i)
     {
-        bestVR = bestVR - derivativeOfFunction(bestVR) / secondDerivativeOfFunction(bestVR);
+        bestVR = bestVR - derivativeOfVRRFunction(bestVR) / secondDerivativeOfVRRFunction(bestVR);
     }
-    long double bestRequirement = bestVR / Q * 0.68l;
+    long double bestRequirement = getBestMax(10.0l, bestVR, [&](long double V) { return V - function(V); }, 100) / Q;
 
+    long double result = function(VR);
     ui->resultLabel->setText("----手续费: " +
-        QString::number(static_cast<long long>(std::round(s))) +
+        QString::number(static_cast<long long>(std::round(result))) +
         " 总利润: " +
-        QString::number(static_cast<long long>(std::round(VR - s))) +
+        QString::number(static_cast<long long>(std::round(VR - result))) +
         " 建议卖价(不精确): " +
         QString::number(static_cast<long long>(std::round(bestRequirement))) +
         "----");
