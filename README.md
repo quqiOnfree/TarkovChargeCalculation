@@ -1,5 +1,5 @@
 # TarkovChargeCalculation
-This is a app for calculating the charge for trading of Escape from Tarkov.
+This is an app for calculating the charge for trading of Escape from Tarkov.
 
 ## How to build it
 1. Install vcpkg
