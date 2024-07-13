@@ -36,7 +36,7 @@ ServiceChargeCalculation::ServiceChargeCalculation(QWidget *parent)
 
     // QTableWidget
     connect(ui->tableWidget, &QTableWidget::cellChanged, this, &ServiceChargeCalculation::onValueCellChanged);
-    connect(ui->tableWidget_2, &QTableWidget::cellChanged, this, &ServiceChargeCalculation::onNeedCellChanged);
+    connect(ui->tableWidget_2, &QTableWidget::cellChanged, this, &ServiceChargeCalculation::onRequirementCellChanged);
 
     // QPushButton
     connect(ui->calculateButton, &QPushButton::clicked, this, &ServiceChargeCalculation::onCalculateClicked);
@@ -98,21 +98,25 @@ void ServiceChargeCalculation::onCalculateClicked()
         };
 
     auto count_value = [this]() {
-        long long count = 0;
+        long double count = 0;
         int row = ui->tableWidget->rowCount();
         for (int i = 0; i < row; ++i)
         {
-            count += ui->tableWidget->item(i, 0)->text().toLongLong() * ui->tableWidget->item(i, 1)->text().toLongLong();
+            long long amount = ui->tableWidget->item(i, 1)->text().toLongLong();
+            if (!amount) continue;
+            count += ui->tableWidget->item(i, 0)->text().toLongLong() * ui->tableWidget->item(i, 1)->text().toLongLong() / times;
         }
         return count;
         };
 
     auto count_need = [this]() {
-        long long count = 0;
+        long double count = 0;
         int row = ui->tableWidget->rowCount();
         for (int i = 0; i < row; ++i)
         {
-            count += ui->tableWidget_2->item(i, 0)->text().toLongLong() * ui->tableWidget->item(i, 1)->text().toLongLong();
+            long long amount = ui->tableWidget->item(i, 1)->text().toLongLong();
+            if (!amount) continue;
+            count += ui->tableWidget_2->item(i, 0)->text().toLongLong() * 1.0l * ui->tableWidget->item(i, 1)->text().toLongLong();
         }
         return count;
         };
@@ -124,7 +128,7 @@ void ServiceChargeCalculation::onCalculateClicked()
         return;
     }
 
-    long double VO = count_value() * 1.0l / Q, VR = count_need() * 1.0l;
+    long double VO = count_value() / Q, VR = count_need();
     if (!VO || !VR)
     {
         ui->resultLabel->setText(" 商品总值为0 ");
@@ -134,49 +138,72 @@ void ServiceChargeCalculation::onCalculateClicked()
     long double PO = VO > VR ? std::pow(std::log10l(VO / VR), 1.08l) : std::log10l(VO / VR),
                 PR = VR >= VO ? std::pow(std::log10l(VR / VO), 1.08l) : std::log10l(VR / VO);
 
-    long double Ti = 0.07, Tr = 0.05;
-    long double s = VO * Ti * 4 * PO * Q + VR * Tr * 4 * PR * Q;
+    long double Ti = 0.03, Tr = 0.03;
+    long double s = VO * Ti * std::pow(4.0l, PO) * Q + VR * Tr * std::pow(4.0l, PR) * Q;
 
-    if (ui->checkBox->isChecked()) s = s * 0.7l;
+    if (ui->checkBox->isChecked()) s = s * (0.7l - ui->spinBox->value() * 0.003l);
 
-    ui->resultLabel->setText(QString::number(static_cast<double>(s)));
+    auto derivativeOfFunction = [&](long double VR) {
+        return 1 + (VO * Ti * Q * std::log10l(4) * std::pow(4.0l, std::log10l(VO / VR)) / VR -
+            Tr * Q * std::log10l(40) * std::pow(4.0l, std::log10l(VR / VO))) * (0.7l - ui->spinBox->value() * 0.003l);
+        };
+
+    auto secondDerivativeOfFunction = [&](long double VR) {
+        return (-1 * VO * Ti * Q * std::pow(std::log10l(4), 2) * std::pow(4.0l, std::log10l(VO / VR)) / std::pow(VR, 2) -
+            Tr * Q * std::log10l(40) * std::log10l(4) * std::pow(4.0l, std::log10l(VR / VO)) / VR) * (0.7l - ui->spinBox->value() * 0.003l);
+        };
+
+    long double bestVR = VR;
+    for (int i = 0; i < 1000; ++i)
+    {
+        bestVR = bestVR - derivativeOfFunction(bestVR) / secondDerivativeOfFunction(bestVR);
+    }
+    long double bestRequirement = bestVR / Q * 0.68l;
+
+    ui->resultLabel->setText("----手续费: " +
+        QString::number(static_cast<long long>(std::round(s))) +
+        " 总利润: " +
+        QString::number(static_cast<long long>(std::round(VR - s))) +
+        " 建议卖价(不精确): " +
+        QString::number(static_cast<long long>(std::round(bestRequirement))) +
+        "----");
 }
 
 /*Therapist为0.63，Ragman为0.62，Jaeger为0.6，Mechanic为0.56，Prapor为=0.5，Peacekeeper为大约0.495，Skier为0.49，Fence为0.4*/
 
 void ServiceChargeCalculation::onTherapistToggled()
 {
-    times = 0.63;
+    times = 0.63l;
 }
 
 void ServiceChargeCalculation::onRagmanToggled()
 {
-    times = 0.62;
+    times = 0.62l;
 }
 
 void ServiceChargeCalculation::onJaegerToggled()
 {
-    times = 0.6;
+    times = 0.6l;
 }
 
 void ServiceChargeCalculation::onMechanicToggled()
 {
-    times = 0.56;
+    times = 0.56l;
 }
 
 void ServiceChargeCalculation::onPraporToggled()
 {
-    times = 0.5;
+    times = 0.5l;
 }
 
 void ServiceChargeCalculation::onPeacekeeperToggled()
 {
-    times = 0.495;
+    times = 0.495l;
 }
 
 void ServiceChargeCalculation::onSkierToggled()
 {
-    times = 0.49;
+    times = 0.49l;
 }
 
 void ServiceChargeCalculation::onFenceToggled()
@@ -189,7 +216,7 @@ void ServiceChargeCalculation::onValueCellChanged(int row, int column)
     auto item = ui->tableWidget->item(row, column);
 }
 
-void ServiceChargeCalculation::onNeedCellChanged(int row, int column)
+void ServiceChargeCalculation::onRequirementCellChanged(int row, int column)
 {
     auto item = ui->tableWidget_2->item(row, column);
 }

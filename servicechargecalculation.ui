@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>587</width>
-    <height>577</height>
+    <width>512</width>
+    <height>531</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,16 +50,6 @@
           <string>1</string>
          </property>
         </row>
-        <row>
-         <property name="text">
-          <string>2</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>3</string>
-         </property>
-        </row>
         <column>
          <property name="text">
           <string>商品价值</string>
@@ -80,26 +70,6 @@
           <string>0</string>
          </property>
         </item>
-        <item row="1" column="0">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
-        <item row="1" column="1">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
-        <item row="2" column="0">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
-        <item row="2" column="1">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
@@ -109,32 +79,12 @@
           <string>1</string>
          </property>
         </row>
-        <row>
-         <property name="text">
-          <string>2</string>
-         </property>
-        </row>
-        <row>
-         <property name="text">
-          <string>3</string>
-         </property>
-        </row>
         <column>
          <property name="text">
           <string>商品卖价</string>
          </property>
         </column>
         <item row="0" column="0">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
-        <item row="1" column="0">
-         <property name="text">
-          <string>0</string>
-         </property>
-        </item>
-        <item row="2" column="0">
          <property name="text">
           <string>0</string>
          </property>
@@ -230,6 +180,26 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="widget_4" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>藏身处管理等级</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinBox">
+           <property name="maximum">
+            <number>50</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="checkBox_2">
         <property name="text">
          <string>所有待售物品的需求</string>
@@ -316,7 +286,7 @@ QPushButton:pressed{
           <widget class="QLabel" name="resultLabel">
            <property name="minimumSize">
             <size>
-             <width>100</width>
+             <width>400</width>
              <height>50</height>
             </size>
            </property>

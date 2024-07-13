@@ -30,10 +30,10 @@ private slots:
 
     // table widget
     void onValueCellChanged(int row, int column);
-    void onNeedCellChanged(int row, int column);
+    void onRequirementCellChanged(int row, int column);
 
 private:
-    double times;
+    long double times;
     Ui::ServiceChargeCalculation *ui;
 };
 #endif // SERVICECHARGECALCULATION_H
