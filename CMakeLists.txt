@@ -21,6 +21,7 @@ set(PROJECT_SOURCES
         servicechargecalculation.cpp
         servicechargecalculation.h
         servicechargecalculation.ui
+        servicechargecalculation.rc
         ${TS_FILES}
 )
 

@@ -156,7 +156,7 @@ void ServiceChargeCalculation::onCalculateClicked()
         return;
     }
 
-    long double VO = count_value() / Q, VR = count_need();
+    long double VO = count_value() / Q, VR = count_need() / Q;
     if (!VO || !VR)
     {
         ui->resultLabel->setText(" 商品总值为0 ");
@@ -187,20 +187,19 @@ void ServiceChargeCalculation::onCalculateClicked()
         };
 
     long double bestVR = VR;
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 100; ++i)
     {
         bestVR = bestVR - derivativeOfVRRFunction(bestVR) / secondDerivativeOfVRRFunction(bestVR);
     }
     long double bestRequirement = getBestMax(10.0l, bestVR, [&](long double V) { return V - function(V); }, 100) / Q;
 
     long double result = function(VR);
-    ui->resultLabel->setText("----手续费: " +
+    ui->resultLabel->setText("手续费: " +
         QString::number(static_cast<long long>(std::round(result))) +
         " 总利润: " +
         QString::number(static_cast<long long>(std::round(VR - result))) +
-        " 建议卖价(不精确): " +
-        QString::number(static_cast<long long>(std::round(bestRequirement))) +
-        "----");
+        " 最高利润卖价: " +
+        QString::number(static_cast<long long>(std::round(bestRequirement))));
 }
 
 /*Therapist为0.63，Ragman为0.62，Jaeger为0.6，Mechanic为0.56，Prapor为=0.5，Peacekeeper为大约0.495，Skier为0.49，Fence为0.4*/
