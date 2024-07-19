@@ -52,9 +52,7 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 
-target_link_libraries(ServiceChargeCalculation PRIVATE
-    Qt${QT_VERSION_MAJOR}::Widgets
-    QT${QT_VERSION_MAJOR}::PrintSupport)
+target_link_libraries(ServiceChargeCalculation PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 set_target_properties(ServiceChargeCalculation PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
