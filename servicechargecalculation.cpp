@@ -25,6 +25,7 @@
 #include <QButtonGroup>
 #include <QRadioButton>
 #include <QTableWidget>
+#include <QtPrintSupport>
 
 template<typename T, typename Func>
 T getBestMax(T begin, T end, Func&& func, size_t n)
