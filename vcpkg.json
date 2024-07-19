@@ -1,0 +1,8 @@
+{
+  "dependencies": [
+    "qt",
+    "qcustomplot",
+    "cpp-httplib",
+    "openssl"
+  ]
+}
