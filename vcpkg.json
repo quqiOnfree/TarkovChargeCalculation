@@ -1,6 +1,7 @@
 {
   "dependencies": [
-    "qt",
+    "qtbase",
+    "vcpkg-qmake",
     "qcustomplot",
     "cpp-httplib",
     "openssl"

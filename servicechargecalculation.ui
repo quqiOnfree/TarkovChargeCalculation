@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>512</width>
+    <width>494</width>
     <height>531</height>
    </rect>
   </property>
@@ -26,6 +26,9 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item row="0" column="2" rowspan="3">
+    <widget class="QCustomPlot" name="customPlot" native="true"/>
    </item>
    <item row="1" column="0">
     <spacer name="horizontalSpacer_3">
@@ -322,7 +325,7 @@ color:rgb(247,247,247);</string>
      </layout>
     </widget>
    </item>
-   <item row="2" column="2">
+   <item row="2" column="3">
     <spacer name="horizontalSpacer_4">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -350,6 +353,14 @@ color:rgb(247,247,247);</string>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QCustomPlot</class>
+   <extends>QWidget</extends>
+   <header>qcustomplot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
