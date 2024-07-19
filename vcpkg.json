@@ -3,6 +3,7 @@
     "qtbase",
     "vcpkg-qmake",
     "qcustomplot",
+    "qttranslations",
     "cpp-httplib",
     "openssl"
   ]
