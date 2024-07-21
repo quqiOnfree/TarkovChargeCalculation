@@ -232,17 +232,19 @@ void ServiceChargeCalculation::onCalculateClicked()
 
     // show data
     std::thread([=]() {
-        const auto logl2 = std::logl(bestRequirement * 2);
-        const size_t size = static_cast<size_t>(bestRequirement * 2) / static_cast<size_t>(logl2);
+        const auto local_logl = std::logl(bestRequirement);
+        const size_t size = static_cast<size_t>(bestRequirement * 3) / static_cast<size_t>(local_logl);
         QVector<double> x(size), y(size);
         double max = -1e10;
+        double max_x = 0;
         for (size_t i = 1; i < size; ++i)
         {
-            x[i] = static_cast<double>(static_cast<long double>(i) * logl2);
+            x[i] = static_cast<double>(static_cast<long double>(i) * local_logl);
             y[i] = static_cast<double>(x[i] * Number - function(x[i]));
             if (y[i] > max) max = y[i];
+            if (y[i] > 0.0) max_x = x[i];
         }
-        showDataSignal(x, y, max);
+        showDataSignal(std::move(x), std::move(y), max, max_x);
         }).detach();
 
     long double result = function(VR);
@@ -306,7 +308,7 @@ void ServiceChargeCalculation::onRequirementCellChanged(int row, int column)
     auto item = ui->tableWidget_2->item(row, column);
 }
 
-void ServiceChargeCalculation::showDataSlot(QVector<double> x, QVector<double> y, double max)
+void ServiceChargeCalculation::showDataSlot(QVector<double> x, QVector<double> y, double max_y, double max_x)
 {
     ui->customPlot->addGraph();
     ui->customPlot->graph(0)->setData(x, y);
@@ -314,8 +316,8 @@ void ServiceChargeCalculation::showDataSlot(QVector<double> x, QVector<double> y
     ui->customPlot->xAxis->setLabel("x");
     ui->customPlot->yAxis->setLabel("y");
     // set axes ranges, so we see all data:
-    ui->customPlot->xAxis->setRange(-10.0, x[x.size() - 1]);
-    ui->customPlot->yAxis->setRange(y[0], max);
+    ui->customPlot->xAxis->setRange(-10.0, max_x);
+    ui->customPlot->yAxis->setRange(y[0], max_y);
     ui->customPlot->replot();
     ui->customPlot->setHidden(false);
     ui->calculateButton->setDisabled(false);
@@ -326,8 +328,8 @@ ServiceChargeCalculation::~ServiceChargeCalculation()
     delete ui;
 }
 
-void ServiceChargeCalculation::showData(QVector<double> x, QVector<double> y, double max)
+void ServiceChargeCalculation::showData(QVector<double> x, QVector<double> y, double max_y, double max_x)
 {
-    emit showDataSignal(std::move(x), std::move(y), max);
+    emit showDataSignal(std::move(x), std::move(y), max_y, max_x);
 }
 

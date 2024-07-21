@@ -34,10 +34,10 @@ public:
     ServiceChargeCalculation(QWidget *parent = nullptr);
     ~ServiceChargeCalculation();
 
-    void showData(QVector<double> x, QVector<double> y, double max);
+    void showData(QVector<double> x, QVector<double> y, double max_y, double max_x);
 
 signals:
-    void showDataSignal(QVector<double> x, QVector<double> y, double max);
+    void showDataSignal(QVector<double> x, QVector<double> y, double max_y, double max_x);
 
 private slots:
     void onCalculateClicked();
@@ -57,7 +57,7 @@ private slots:
     void onRequirementCellChanged(int row, int column);
 
     // custom plot
-    void showDataSlot(QVector<double> x, QVector<double> y, double max);
+    void showDataSlot(QVector<double> x, QVector<double> y, double max_y, double max_x);
 
 private:
     long double times;
