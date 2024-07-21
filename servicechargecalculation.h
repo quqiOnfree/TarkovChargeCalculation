@@ -20,6 +20,7 @@
 #define SERVICECHARGECALCULATION_H
 
 #include <QWidget>
+#include <QVector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ServiceChargeCalculation; }
@@ -32,6 +33,11 @@ class ServiceChargeCalculation : public QWidget
 public:
     ServiceChargeCalculation(QWidget *parent = nullptr);
     ~ServiceChargeCalculation();
+
+    void showData(QVector<double> x, QVector<double> y, double max);
+
+signals:
+    void showDataSignal(QVector<double> x, QVector<double> y, double max);
 
 private slots:
     void onCalculateClicked();
@@ -49,6 +55,9 @@ private slots:
     // table widget
     void onValueCellChanged(int row, int column);
     void onRequirementCellChanged(int row, int column);
+
+    // custom plot
+    void showDataSlot(QVector<double> x, QVector<double> y, double max);
 
 private:
     long double times;
