@@ -118,6 +118,7 @@ void ServiceChargeCalculation::onCalculateClicked()
                 if (!ok)
                 {
                     ui->resultLabel->setText(" 表格数据读取错误，可能含有非数字 ");
+                    ui->calculateButton->setDisabled(false);
                     return;
                 }
             }
@@ -135,6 +136,7 @@ void ServiceChargeCalculation::onCalculateClicked()
                 if (!ok)
                 {
                     ui->resultLabel->setText(" 表格数据读取错误，可能含有非数字 ");
+                    ui->calculateButton->setDisabled(false);
                     return;
                 }
             }
@@ -145,6 +147,7 @@ void ServiceChargeCalculation::onCalculateClicked()
     if (times == 0.0)
     {
         ui->resultLabel->setText(" 请选择商人 ");
+        ui->calculateButton->setDisabled(false);
         return;
     }
 
@@ -187,6 +190,7 @@ void ServiceChargeCalculation::onCalculateClicked()
     long long Q = ui->checkBox_2->isChecked() ? 1 : count_calculate();
     if (!Q)
     {
+        ui->calculateButton->setDisabled(false);
         ui->resultLabel->setText(" 商品总数为0 ");
         return;
     }
@@ -194,6 +198,7 @@ void ServiceChargeCalculation::onCalculateClicked()
     long double VO = count_value() / Q, VR = count_need() / Q;
     if (!VO || !VR)
     {
+        ui->calculateButton->setDisabled(false);
         ui->resultLabel->setText(" 商品总值为0 ");
         return;
     }
